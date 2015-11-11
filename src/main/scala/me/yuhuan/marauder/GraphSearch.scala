@@ -10,20 +10,34 @@ import me.yuhuan.util.default
 
 
 object GraphSearch {
-  //  def dfs[S](start: S, isGoal: S ⇒ Boolean)(implicit S: StateSpace[S]): Unit = {
-  //    val fringe = mutable.Stack(SearchNode[S](start, SearchNode.Dummy))
-  //    val explored = mutable.HashSet[S]()
-  //
-  //    var success = false
-  //
-  //    while (fringe.nonEmpty && !success) {
-  //      val cur = fringe.pop()
-  //      if (!(explored contains cur.state)) {
-  //        explored += cur.state
-  //        fringe pushAll S.succ(cur.state).map(s ⇒ SearchNode(s, cur))
-  //      }
-  //    }
-  //  }
+    def dfs[S](start: S, isGoal: S ⇒ Boolean)(implicit S: StateSpace[S]): Seq[S] = {
+      val fringe = mutable.ArrayStack(SearchNode[S](start, SearchNode.Dummy))
+      val explored = mutable.HashSet[S]()
+
+      var success = false
+      var cur: SearchNode[S] = null
+
+      while (fringe.nonEmpty && !success) {
+        cur = fringe.pop()
+
+        if (isGoal(cur.state)) success = true
+        else {
+          if (!(explored contains cur.state)) {
+            explored += cur.state
+            fringe ++= S.succ(cur.state).map(s ⇒ SearchNode(s, cur)).reverse
+          }
+        }
+      }
+
+      val history = mutable.ArrayBuffer[S]()
+      var parent = cur
+      while (parent != SearchNode.Dummy) {
+        history += parent.state
+        parent = parent.parent
+      }
+
+      history.reverse
+    }
 
   def dfsa[S, A](start: S, isGoal: S ⇒ Boolean)(implicit S: StateSpaceWithAction[S, A]): Path[S, A] =
     depthFirstWithAction(start, isGoal)(S)
