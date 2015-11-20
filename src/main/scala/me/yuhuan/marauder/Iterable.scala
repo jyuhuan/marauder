@@ -8,4 +8,8 @@ object Iterable {
     def iterator: Iterator[S] = Iterator.depthFirst(s)(S)
   }
 
+  def breadthFirst[S](s: S)(implicit S: StateSpace[S]): Iterable[S] = new scala.collection.Iterable[S] {
+    def iterator: Iterator[S] = Iterator.breadthFirst(s)(S)
+  }
+
 }
